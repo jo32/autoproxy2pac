@@ -2,6 +2,7 @@ let Q = require('q');
 let url = require('url');
 let fs = require('fs');
 let request = require('superagent');
+let path = require('path');
 
 const GFW_LIST_URL = 'https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt';
 
@@ -78,5 +79,52 @@ function parseAutoProxyFile(ruleList) {
 }
 
 async function reduceDomains(domains) {
-    var tldContent = Q.nfcall(fs.readFile, './')
+    let tldContent = await Q.nfcall(fs.readFile, path.join(__dirname, '../resources/tld.txt'));
+    let tlds = new Set(tldContent.split('\n'));
+    let newDomains = new Set();
+    for (let domain of domains) {
+        let domainParts = domain.split('.');
+        let lastRootDomain = null;
+        for (let i = 0; i < domainParts.length; i++) {
+            let rootDomain = domainParts.slice(domainParts.length - i - 1).join('.');
+            if (i == 0) {
+                if (!tlds.has(rootDomain)) {
+                    break;
+                }
+            }
+            lastRootDomain = rootDomain;
+            if (tlds.has(rootDomain)) {
+                continue;
+            } else {
+                break;
+            }
+        }
+        if (lastRootDomain != null) {
+            newDomains.add(lastRootDomain);
+        }
+    }
+    let uniDomains = new Set();
+    for (let domain of newDomains) {
+        let domainParts = domain.split('.');
+        for (let i = 0; i < domainParts.length - 1; i++) {
+            let rootDomain = domainParts.slice(domainParts.length - i - 1).join('.');
+            if (domains.has(rootDomain)) {
+                break;
+            } else {
+                uniDomains.add(domain);
+            }
+        }
+    }
+    return uniDomains;
 }
+
+(async function() {
+    try {
+        var ruleList = await getRuleList();
+        var domains = parseAutoProxyFile(ruleList);
+        domains = await reduceDomains(domains);
+    } catch(e) {
+        console.log(e);
+    }
+    console.log(domains);
+})();
