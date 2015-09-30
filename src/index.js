@@ -38,7 +38,9 @@ function addDomainToSet(set, str) {
 }
 
 async function getAutoProxyFile(localPath) {
-    if (localPath && !(await fs.exists(localPath))) {
+    if (localPath && !(await new Promise(function(resolve, reject) {
+        fs.exists(localPath, resolve);
+    }))) {
         return await Promise.reject(new Error('File at localPath not exist'));
     }
 

@@ -60,7 +60,9 @@ function getAutoProxyFile(localPath) {
                 }
 
                 context$1$0.next = 4;
-                return _regeneratorRuntime.awrap(fs.exists(localPath));
+                return _regeneratorRuntime.awrap(new _Promise(function (resolve, reject) {
+                    fs.exists(localPath, resolve);
+                }));
 
             case 4:
                 context$1$0.t0 = !context$1$0.sent;
