@@ -163,6 +163,31 @@ async function generatePrecisePac(ruleList, proxy) {
     return pac;
 }
 
+async function genPac(opts) {
+    if (!opts.proxy) {
+        throw new Error('Proxy is required!');
+    }
+
+    let input = opts.input;
+    let output = opts.output || './proxy.pac';
+    let proxy = opts.proxy;
+    if (!proxy) {
+        throw new Error('Proxy is required!');
+    }
+    let precise = opts.precise;
+
+    let pac = null;
+    let ruleList = await getRuleList(input);
+    if (precise) {
+        pac = await generatePrecisePac(ruleList, proxy);
+    } else {
+        let domains = parseAutoProxyFile(ruleList);
+        domains = await reduceDomains(domains);
+        pac = await generateFastPac(domains, proxy);
+    }
+    return pac;
+}
+
 // running as script
 if (!module.parent) {
 
@@ -179,23 +204,8 @@ if (!module.parent) {
                 .option('--precise', 'if generating a precise proxy pac according to Ad Block Plus implementation')
                 .parse(process.argv);
 
-            let input = program.input;
             let output = program.output || './proxy.pac';
-            let proxy = program.proxy;
-            if (!proxy) {
-                throw new Error('Proxy is required!');
-            }
-            let precise = program.precise;
-
-            let pac = null;
-            let ruleList = await getRuleList(input);
-            if (precise) {
-                pac = await generatePrecisePac(ruleList, proxy);
-            } else {
-                let domains = parseAutoProxyFile(ruleList);
-                domains = await reduceDomains(domains);
-                pac = await generateFastPac(domains, proxy);
-            }
+            let pac = await genPac(program);
             await Q.nfcall(fs.writeFile, output, pac);
             log('pac has been written to: ' + output);
         } catch(e) {
@@ -207,10 +217,6 @@ if (!module.parent) {
 } else {
 
     module.exports = {
-        getRuleList: getRuleList,
-        parseAutoProxyFile: parseAutoProxyFile,
-        reduceDomains: reduceDomains,
-        generateFastPac: generateFastPac,
-        generatePrecisePac: generateFastPac
+        genPac: genPac
     }
 }
