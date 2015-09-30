@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "autoproxy2pac": "build/index.js"
+    "autoproxy2pac": "build/autoproxy2pac.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
