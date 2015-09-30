@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-runtime": "^5.8.25",
+    "commander": "^2.8.1",
     "q": "^1.4.1",
     "superagent": "^1.4.0"
   },

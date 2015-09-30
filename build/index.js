@@ -14,6 +14,19 @@ var fs = require('fs');
 var request = require('superagent');
 var path = require('path');
 
+var isRunningAsScript = module.parent ? false : true;
+function log(message) {
+    if (!isRunningAsScript) {
+        return;
+    }
+    if (Object.prototype.toString.apply(message) == '[object Error]') {
+        console.error('[ERROR] ' + message.message);
+        console.error(message.stack);
+        return;
+    }
+    console.log('[INFO] ' + message);
+}
+
 var GFW_LIST_URL = 'https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt';
 
 function decodeAutoproxyContent(inputStr) {
@@ -65,18 +78,21 @@ function getAutoProxyFile(localPath) {
 
             case 9:
                 if (!localPath) {
-                    context$1$0.next = 13;
+                    context$1$0.next = 14;
                     break;
                 }
 
-                context$1$0.next = 12;
+                log('getting file from: ' + localPath);
+                context$1$0.next = 13;
                 return _regeneratorRuntime.awrap(Q.nfcall(fs.readFile, localPath, 'utf-8'));
 
-            case 12:
+            case 13:
                 return context$1$0.abrupt('return', context$1$0.sent);
 
-            case 13:
-                context$1$0.next = 15;
+            case 14:
+
+                log('getting file from: ' + GFW_LIST_URL);
+                context$1$0.next = 17;
                 return _regeneratorRuntime.awrap(new _Promise(function (resolve, reject) {
                     request.get(GFW_LIST_URL).end(function (err, resp) {
                         if (err) {
@@ -87,10 +103,10 @@ function getAutoProxyFile(localPath) {
                     });
                 }));
 
-            case 15:
+            case 17:
                 return context$1$0.abrupt('return', context$1$0.sent);
 
-            case 16:
+            case 18:
             case 'end':
                 return context$1$0.stop();
         }
@@ -175,7 +191,7 @@ function reduceDomains(domains) {
         while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return _regeneratorRuntime.awrap(Q.nfcall(fs.readFile, path.join(__dirname, '../resources/tld.txt')));
+                return _regeneratorRuntime.awrap(Q.nfcall(fs.readFile, path.join(__dirname, '../resources/tld.txt'), 'utf-8'));
 
             case 2:
                 tldContent = context$1$0.sent;
@@ -370,38 +386,197 @@ function reduceDomains(domains) {
     }, null, this, [[8, 35, 39, 47], [40,, 42, 46], [51, 72, 76, 84], [77,, 79, 83]]);
 }
 
-(function callee$0$0() {
-    var ruleList, domains;
-    return _regeneratorRuntime.async(function callee$0$0$(context$1$0) {
+function generateFastPac(domains, proxy) {
+    var pacTemplate, domainDict, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, domain, pac;
+
+    return _regeneratorRuntime.async(function generateFastPac$(context$1$0) {
         while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
-                context$1$0.prev = 0;
-                context$1$0.next = 3;
-                return _regeneratorRuntime.awrap(getRuleList());
+                context$1$0.next = 2;
+                return _regeneratorRuntime.awrap(Q.nfcall(fs.readFile, path.join(__dirname, '../resources/proxy.pac'), 'utf-8'));
 
-            case 3:
-                ruleList = context$1$0.sent;
-                domains = parseAutoProxyFile(ruleList);
-                context$1$0.next = 7;
-                return _regeneratorRuntime.awrap(reduceDomains(domains));
+            case 2:
+                pacTemplate = context$1$0.sent;
+                domainDict = {};
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
+                context$1$0.prev = 7;
 
-            case 7:
-                domains = context$1$0.sent;
-                context$1$0.next = 13;
+                for (_iterator4 = _getIterator(domains); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    domain = _step4.value;
+
+                    domainDict[domain] = 1;
+                }
+                context$1$0.next = 15;
                 break;
 
-            case 10:
-                context$1$0.prev = 10;
-                context$1$0.t0 = context$1$0['catch'](0);
+            case 11:
+                context$1$0.prev = 11;
+                context$1$0.t0 = context$1$0['catch'](7);
+                _didIteratorError4 = true;
+                _iteratorError4 = context$1$0.t0;
 
-                console.log(context$1$0.t0);
+            case 15:
+                context$1$0.prev = 15;
+                context$1$0.prev = 16;
 
-            case 13:
-                console.log(domains);
+                if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                    _iterator4['return']();
+                }
 
-            case 14:
+            case 18:
+                context$1$0.prev = 18;
+
+                if (!_didIteratorError4) {
+                    context$1$0.next = 21;
+                    break;
+                }
+
+                throw _iteratorError4;
+
+            case 21:
+                return context$1$0.finish(18);
+
+            case 22:
+                return context$1$0.finish(15);
+
+            case 23:
+                pac = pacTemplate.replace(/__PROXY__/, JSON.stringify(proxy)).replace('__DOMAINS__', JSON.stringify(domainDict, null, 2));
+                return context$1$0.abrupt('return', pac);
+
+            case 25:
             case 'end':
                 return context$1$0.stop();
         }
-    }, null, this, [[0, 10]]);
-})();
+    }, null, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+}
+
+function generatePrecisePac(ruleList, proxy) {
+    var pacTemplate, pac;
+    return _regeneratorRuntime.async(function generatePrecisePac$(context$1$0) {
+        while (1) switch (context$1$0.prev = context$1$0.next) {
+            case 0:
+                ruleList = ruleList.filter(function (val, index) {
+                    if (!val) {
+                        return false;
+                    }
+                    if (val.indexOf('!') == 0) {
+                        return false;
+                    }
+                    if (val.indexOf('[') == 0) {
+                        return false;
+                    }
+                    return true;
+                });
+                context$1$0.next = 3;
+                return _regeneratorRuntime.awrap(Q.nfcall(fs.readFile, path.join(__dirname, '../resources/abp.js'), 'utf-8'));
+
+            case 3:
+                pacTemplate = context$1$0.sent;
+                pac = pacTemplate.replace(/__PROXY__/, JSON.stringify(proxy)).replace('__RULES__', JSON.stringify(ruleList, null, 2));
+                return context$1$0.abrupt('return', pac);
+
+            case 6:
+            case 'end':
+                return context$1$0.stop();
+        }
+    }, null, this);
+}
+
+// running as script
+if (!module.parent) {
+    (function () {
+
+        var program = require('commander');
+        var packageInfo = require('../package.json');
+
+        (function callee$1$0() {
+            var input, output, proxy, precise, pac, ruleList, domains;
+            return _regeneratorRuntime.async(function callee$1$0$(context$2$0) {
+                while (1) switch (context$2$0.prev = context$2$0.next) {
+                    case 0:
+                        context$2$0.prev = 0;
+
+                        program.version(packageInfo.version).option('-i, --input [path]', 'file path to the autoproxy file, an online download of g-f-w-list will happend if not given').option('-o, --output [path]', 'file path to the generated pac, ./proxy.pac will be written is not given').option('-p, --proxy <proxy>', 'proxy, required, for example: SOCKS 127.0.0.1:8080').option('--precise', 'if generating a precise proxy pac according to Ad Block Plus implementation').parse(process.argv);
+
+                        input = program.input;
+                        output = program.output || './proxy.pac';
+                        proxy = program.proxy;
+
+                        if (proxy) {
+                            context$2$0.next = 7;
+                            break;
+                        }
+
+                        throw new Error('Proxy is required!');
+
+                    case 7:
+                        precise = program.precise;
+                        pac = null;
+                        context$2$0.next = 11;
+                        return _regeneratorRuntime.awrap(getRuleList(input));
+
+                    case 11:
+                        ruleList = context$2$0.sent;
+
+                        if (!precise) {
+                            context$2$0.next = 18;
+                            break;
+                        }
+
+                        context$2$0.next = 15;
+                        return _regeneratorRuntime.awrap(generatePrecisePac(ruleList, proxy));
+
+                    case 15:
+                        pac = context$2$0.sent;
+                        context$2$0.next = 25;
+                        break;
+
+                    case 18:
+                        domains = parseAutoProxyFile(ruleList);
+                        context$2$0.next = 21;
+                        return _regeneratorRuntime.awrap(reduceDomains(domains));
+
+                    case 21:
+                        domains = context$2$0.sent;
+                        context$2$0.next = 24;
+                        return _regeneratorRuntime.awrap(generateFastPac(domains, proxy));
+
+                    case 24:
+                        pac = context$2$0.sent;
+
+                    case 25:
+                        context$2$0.next = 27;
+                        return _regeneratorRuntime.awrap(Q.nfcall(fs.writeFile, output, pac));
+
+                    case 27:
+                        log('pac has been written to: ' + output);
+                        context$2$0.next = 33;
+                        break;
+
+                    case 30:
+                        context$2$0.prev = 30;
+                        context$2$0.t0 = context$2$0['catch'](0);
+
+                        log(context$2$0.t0);
+
+                    case 33:
+                    case 'end':
+                        return context$2$0.stop();
+                }
+            }, null, this, [[0, 30]]);
+        })();
+
+        // running as module
+    })();
+} else {
+
+        module.exports = {
+            getRuleList: getRuleList,
+            parseAutoProxyFile: parseAutoProxyFile,
+            reduceDomains: reduceDomains,
+            generateFastPac: generateFastPac,
+            generatePrecisePac: generateFastPac
+        };
+    }
