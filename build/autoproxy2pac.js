@@ -195,7 +195,7 @@ function parseAutoProxyFile(ruleList) {
 }
 
 function reduceDomains(domains) {
-    var tldContent, tlds, newDomains, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, domain, domainParts, lastRootDomain, _i, rootDomain, uniDomains, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _i2, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, i;
+    var tldContent, tlds, newDomains, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, domain, domainParts, lastRootDomain, i, rootDomain, uniDomains, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3;
 
     return _regeneratorRuntime.async(function reduceDomains$(context$1$0) {
         while (1) switch (context$1$0.prev = context$1$0.next) {
@@ -222,17 +222,17 @@ function reduceDomains(domains) {
                 domain = _step2.value;
                 domainParts = domain.split('.');
                 lastRootDomain = null;
-                _i = 0;
+                i = 0;
 
             case 15:
-                if (!(_i < domainParts.length)) {
+                if (!(i < domainParts.length)) {
                     context$1$0.next = 29;
                     break;
                 }
 
-                rootDomain = domainParts.slice(domainParts.length - _i - 1).join('.');
+                rootDomain = domainParts.slice(domainParts.length - i - 1).join('.');
 
-                if (!(_i == 0)) {
+                if (!(i == 0)) {
                     context$1$0.next = 20;
                     break;
                 }
@@ -258,7 +258,7 @@ function reduceDomains(domains) {
                 return context$1$0.abrupt('break', 29);
 
             case 26:
-                _i++;
+                i++;
                 context$1$0.next = 15;
                 break;
 
@@ -316,145 +316,91 @@ function reduceDomains(domains) {
 
             case 53:
                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                    context$1$0.next = 71;
+                    context$1$0.next = 69;
                     break;
                 }
 
                 domain = _step3.value;
-
-                if (domain.indexOf('j.mp') >= 0) {
-                    console.log(domain);
-                }
                 domainParts = domain.split('.');
-                _i2 = undefined;
-                _i2 = 0;
+                i = undefined;
+                i = 0;
 
-            case 59:
-                if (!(_i2 < domainParts.length - 1)) {
-                    context$1$0.next = 67;
+            case 58:
+                if (!(i < domainParts.length - 1)) {
+                    context$1$0.next = 65;
                     break;
                 }
 
-                rootDomain = domainParts.slice(domainParts.length - _i2 - 1).join('.');
-
-                if (domain.indexOf('j.mp') >= 0) {
-                    console.log(rootDomain, domains.has(rootDomain));
-                }
+                rootDomain = domainParts.slice(domainParts.length - i - 1).join('.');
 
                 if (!domains.has(rootDomain)) {
-                    context$1$0.next = 64;
+                    context$1$0.next = 62;
                     break;
                 }
 
-                return context$1$0.abrupt('break', 67);
+                return context$1$0.abrupt('break', 65);
 
-            case 64:
-                _i2++;
-                context$1$0.next = 59;
+            case 62:
+                i++;
+                context$1$0.next = 58;
                 break;
 
-            case 67:
-                if (_i2 == domainParts.length - 1) {
+            case 65:
+                if (i == domainParts.length - 1) {
                     uniDomains.add(domain);
                 }
 
-            case 68:
+            case 66:
                 _iteratorNormalCompletion3 = true;
                 context$1$0.next = 53;
                 break;
 
-            case 71:
-                context$1$0.next = 77;
+            case 69:
+                context$1$0.next = 75;
                 break;
 
-            case 73:
-                context$1$0.prev = 73;
+            case 71:
+                context$1$0.prev = 71;
                 context$1$0.t1 = context$1$0['catch'](51);
                 _didIteratorError3 = true;
                 _iteratorError3 = context$1$0.t1;
 
-            case 77:
-                context$1$0.prev = 77;
-                context$1$0.prev = 78;
+            case 75:
+                context$1$0.prev = 75;
+                context$1$0.prev = 76;
 
                 if (!_iteratorNormalCompletion3 && _iterator3['return']) {
                     _iterator3['return']();
                 }
 
-            case 80:
-                context$1$0.prev = 80;
+            case 78:
+                context$1$0.prev = 78;
 
                 if (!_didIteratorError3) {
-                    context$1$0.next = 83;
+                    context$1$0.next = 81;
                     break;
                 }
 
                 throw _iteratorError3;
 
+            case 81:
+                return context$1$0.finish(78);
+
+            case 82:
+                return context$1$0.finish(75);
+
             case 83:
-                return context$1$0.finish(80);
-
-            case 84:
-                return context$1$0.finish(77);
-
-            case 85:
-                _iteratorNormalCompletion4 = true;
-                _didIteratorError4 = false;
-                _iteratorError4 = undefined;
-                context$1$0.prev = 88;
-
-                for (_iterator4 = _getIterator(uniDomains); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    i = _step4.value;
-
-                    if (i.indexOf('j.mp') >= 0) {
-                        console.log('========');
-                    }
-                }
-                context$1$0.next = 96;
-                break;
-
-            case 92:
-                context$1$0.prev = 92;
-                context$1$0.t2 = context$1$0['catch'](88);
-                _didIteratorError4 = true;
-                _iteratorError4 = context$1$0.t2;
-
-            case 96:
-                context$1$0.prev = 96;
-                context$1$0.prev = 97;
-
-                if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-                    _iterator4['return']();
-                }
-
-            case 99:
-                context$1$0.prev = 99;
-
-                if (!_didIteratorError4) {
-                    context$1$0.next = 102;
-                    break;
-                }
-
-                throw _iteratorError4;
-
-            case 102:
-                return context$1$0.finish(99);
-
-            case 103:
-                return context$1$0.finish(96);
-
-            case 104:
                 return context$1$0.abrupt('return', uniDomains);
 
-            case 105:
+            case 84:
             case 'end':
                 return context$1$0.stop();
         }
-    }, null, this, [[8, 35, 39, 47], [40,, 42, 46], [51, 73, 77, 85], [78,, 80, 84], [88, 92, 96, 104], [97,, 99, 103]]);
+    }, null, this, [[8, 35, 39, 47], [40,, 42, 46], [51, 71, 75, 83], [76,, 78, 82]]);
 }
 
 function generateFastPac(domains, proxy) {
-    var pacTemplate, domainDict, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, domain, pac;
+    var pacTemplate, domainDict, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, domain, pac;
 
     return _regeneratorRuntime.async(function generateFastPac$(context$1$0) {
         while (1) switch (context$1$0.prev = context$1$0.next) {
@@ -465,13 +411,13 @@ function generateFastPac(domains, proxy) {
             case 2:
                 pacTemplate = context$1$0.sent;
                 domainDict = {};
-                _iteratorNormalCompletion5 = true;
-                _didIteratorError5 = false;
-                _iteratorError5 = undefined;
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
                 context$1$0.prev = 7;
 
-                for (_iterator5 = _getIterator(domains); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    domain = _step5.value;
+                for (_iterator4 = _getIterator(domains); !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    domain = _step4.value;
 
                     domainDict[domain] = 1;
                 }
@@ -481,26 +427,26 @@ function generateFastPac(domains, proxy) {
             case 11:
                 context$1$0.prev = 11;
                 context$1$0.t0 = context$1$0['catch'](7);
-                _didIteratorError5 = true;
-                _iteratorError5 = context$1$0.t0;
+                _didIteratorError4 = true;
+                _iteratorError4 = context$1$0.t0;
 
             case 15:
                 context$1$0.prev = 15;
                 context$1$0.prev = 16;
 
-                if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-                    _iterator5['return']();
+                if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+                    _iterator4['return']();
                 }
 
             case 18:
                 context$1$0.prev = 18;
 
-                if (!_didIteratorError5) {
+                if (!_didIteratorError4) {
                     context$1$0.next = 21;
                     break;
                 }
 
-                throw _iteratorError5;
+                throw _iteratorError4;
 
             case 21:
                 return context$1$0.finish(18);
