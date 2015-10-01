@@ -64,7 +64,9 @@ async function getAutoProxyFile(localPath) {
 async function getRuleList(localPath) {
     let content = await getAutoProxyFile(localPath);
     content = decodeAutoproxyContent(content);
-    return content.split('\n');
+    let builtIn = await Q.nfcall(fs.readFile, path.join(__dirname, '../resources/builtin.txt'), 'utf-8');
+    content = content.split(/\r?\n/g).concat(builtIn.split(/\r?\n/g));
+    return content;
 }
 
 function parseAutoProxyFile(ruleList) {
@@ -73,7 +75,7 @@ function parseAutoProxyFile(ruleList) {
         if (line.indexOf('.*') >= 0) {
             continue
         } else if (line.indexOf('*') >= 0) {
-            line = line.replace('*', '/')
+            line = line.replace(/\*/g, '/')
         }
         if (line.indexOf('||') == 0) {
             line = line.replace('||', '')
@@ -97,7 +99,7 @@ function parseAutoProxyFile(ruleList) {
 
 async function reduceDomains(domains) {
     let tldContent = await Q.nfcall(fs.readFile, path.join(__dirname, '../resources/tld.txt'), 'utf-8');
-    let tlds = new Set(tldContent.split('\n'));
+    let tlds = new Set(tldContent.split(/\r?\n/g));
     let newDomains = new Set();
     for (let domain of domains) {
         let domainParts = domain.split('.');
@@ -123,13 +125,15 @@ async function reduceDomains(domains) {
     let uniDomains = new Set();
     for (let domain of newDomains) {
         let domainParts = domain.split('.');
-        for (let i = 0; i < domainParts.length - 1; i++) {
+        let i;
+        for (i = 0; i < domainParts.length - 1; i++) {
             let rootDomain = domainParts.slice(domainParts.length - i - 1).join('.');
             if (domains.has(rootDomain)) {
                 break;
-            } else {
-                uniDomains.add(domain);
             }
+        }
+        if (i == domainParts.length - 1) {
+            uniDomains.add(domain);
         }
     }
     return uniDomains;
